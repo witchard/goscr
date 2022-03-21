@@ -1,0 +1,2 @@
+fmt.Println("Hello goscr, searching stdin for 'Error'")
+script.Stdin().Match("Error").Stdout()
