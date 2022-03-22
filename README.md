@@ -25,8 +25,8 @@ Under the hood, a `.goscr` directory in your home drive is used to compile your 
 
 This project has only just started... we still need to:
 
-- [] Support compiling the same program twice - currently bombs out
-- [] Used cached compiled code when the same script is run
+- [X] Support compiling the same program twice - currently bombs out
+- [X] Used cached compiled code when the same script is run
 - [] Lock compilation directory so that parallel runs don't interfere with each other
 - [] Support command line options for your scripts
 - [] Support `-C` for passing code on the command line
