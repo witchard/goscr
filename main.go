@@ -10,7 +10,7 @@ import (
 	"syscall"
 )
 
-var logger *log.Logger
+var dbg *log.Logger
 
 func main() {
 	args := flag.NewFlagSet("goscr", flag.ContinueOnError)
@@ -24,13 +24,14 @@ func main() {
 	}
 
 	if debug {
-		logger = log.New(os.Stdout, "goscr", log.LstdFlags)
+		dbg = log.New(os.Stderr, "debug ", log.LstdFlags)
 	} else {
-		logger = log.New(io.Discard, "goscr", log.LstdFlags)
+		dbg = log.New(io.Discard, "debug ", log.LstdFlags)
 	}
 
 	var runArgs []string
 	if code != "" {
+		dbg.Println("Using code from command line")
 		runArgs = append([]string{"goscr"}, args.Args()...)
 	} else {
 		if len(args.Args()) == 0 {
@@ -39,6 +40,7 @@ func main() {
 			os.Exit(1)
 		}
 
+		dbg.Println("Reading code from", args.Arg(0))
 		codeRaw, err := os.ReadFile(args.Arg(0))
 		if err != nil {
 			log.Fatalln(err)
@@ -50,6 +52,7 @@ func main() {
 
 	// Check if already compiled
 	hash := Hash(code)
+	dbg.Println("Code hash is", hash)
 	basedir, err := Workdir()
 	if err != nil {
 		log.Fatalln(err)
@@ -61,19 +64,24 @@ func main() {
 	}
 
 	if !exists {
+		dbg.Println("Creating code in", workdir)
 		err = Create(code, []string{}, workdir)
 		if err != nil {
 			os.RemoveAll(workdir) // Cleanup as something failed
 			log.Fatalln("Failed to create script compilation directory", err)
 		}
 
+		dbg.Println("Compiling code")
 		err = Compile(workdir)
 		if err != nil {
 			os.RemoveAll(workdir) // Cleanup as something failed
 			log.Fatalln("Failed to compile script in", workdir, err)
 		}
 	}
-	err = syscall.Exec(filepath.Join(workdir, "goscr"), runArgs, os.Environ())
+
+	binary := filepath.Join(workdir, "goscr")
+	dbg.Println("Executing", binary, "with args", runArgs)
+	err = syscall.Exec(binary, runArgs, os.Environ())
 	if err != nil {
 		log.Fatalln("Failed to execute compiled script in", workdir, err)
 	}
