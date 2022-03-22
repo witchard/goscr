@@ -2,7 +2,7 @@
 
 Use go like its a scripting language
 
-Inspired by https://github.com/bitfield/script, this project aims to make it even easier to write go "scripts". The aim is to eventually be able to do something like `goscr -C 'script.Stdin().Match("Error").Stdout()'` to quickly run a go script.
+Inspired by https://github.com/bitfield/script, this project aims to make it even easier to write go "scripts". You can for example do things like `goscr -c 'script.Stdin().Match("Error").Stdout()'` to quickly run a go script. You can also pass a script in as a file as `goscr <somescript>`.
 
 ## Installation
 
@@ -27,13 +27,13 @@ This project has only just started... we still need to:
 
 - [X] Support compiling the same program twice - currently bombs out
 - [X] Used cached compiled code when the same script is run
-- [] Lock compilation directory so that parallel runs don't interfere with each other
-- [] Support command line options for your scripts
-- [] Support `-C` for passing code on the command line
-- [] Allow user to hint at what imports are needed
-- [] Provide better mechanism for presenting compilation errors back to the user (map line numbers)
-- [] Clean up old compilation directories
-- [] Test on mac and windows
-- [] Support mode where code is run against each line of stdin
-- [] Support extra user code from different files
-- [] ?Add support for testing scripts?
+- [ ] Lock compilation directory so that parallel runs don't interfere with each other
+- [X] Support command line options for your scripts
+- [X] Support `-c` for passing code on the command line
+- [ ] Allow user to hint at what imports are needed
+- [ ] Provide better mechanism for presenting compilation errors back to the user (map line numbers)
+- [ ] Clean up old compilation directories
+- [ ] Test on mac and windows
+- [ ] Support mode where code is run against each line of stdin
+- [ ] Support extra user code from different files
+- [ ] ?Add support for testing scripts?
