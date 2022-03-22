@@ -34,4 +34,6 @@ This project has only just started... we still need to:
 - [] Provide better mechanism for presenting compilation errors back to the user (map line numbers)
 - [] Clean up old compilation directories
 - [] Test on mac and windows
+- [] Support mode where code is run against each line of stdin
+- [] Support extra user code from different files
 - [] ?Add support for testing scripts?
