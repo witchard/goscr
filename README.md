@@ -43,3 +43,4 @@ This project has only just started... we still need to:
 - [ ] Clean up old compilation directories
 - [ ] Test on mac and windows
 - [X] Support mode where code is run against each line of stdin
+- [ ] Improve module documentation (and of lines)
