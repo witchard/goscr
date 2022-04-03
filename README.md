@@ -21,6 +21,14 @@ Simply pass a file with your go code in... this code is wrapped up as a function
 
 Under the hood, a `.goscr` directory in your home drive is used to compile your scripts as full go programs.
 
+A function `P` is available that behaves like `fmt.Println` for printing stuff out. A similar function `E` is also available, but prints to stderr.
+
+A function `L` is available for processing each line of stdin, it calls a callback function for each line (simple data types are converted automatically), for example:
+
+```bash
+echo -e "1\n2\n3" | goscr -c "s := 0; err = L(func(i int){s += i}); P(s)"
+```
+
 ## To do
 
 This project has only just started... we still need to:
@@ -34,6 +42,4 @@ This project has only just started... we still need to:
 - [ ] Provide better mechanism for presenting compilation errors back to the user (map line numbers)
 - [ ] Clean up old compilation directories
 - [ ] Test on mac and windows
-- [ ] Support mode where code is run against each line of stdin
-- [ ] Support extra user code from different files
-- [ ] ?Add support for testing scripts?
+- [X] Support mode where code is run against each line of stdin

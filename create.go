@@ -9,13 +9,28 @@ import (
 const header string = `package main
 
 import (
+	"fmt"
+	"os"
+	"github.com/witchard/goscr/lines"
 `
 
 const body string = `)
 
+func P(a ...any) (int, error) {
+	return fmt.Println(a...)
+}
+
+func E(a ...any) (int, error) {
+	return fmt.Fprintln(os.Stderr, a...)
+}
+
+func L(cb any) error {
+	return lines.EachStdin(cb)
+}
+
 func main() {
 	if err := __run_goscr__(); err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
