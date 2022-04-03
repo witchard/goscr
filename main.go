@@ -15,8 +15,10 @@ var dbg *log.Logger
 func main() {
 	args := flag.NewFlagSet("goscr", flag.ContinueOnError)
 	var debug bool
+	var keep bool
 	var code string
 	args.BoolVar(&debug, "d", false, "Enable debug logging")
+	args.BoolVar(&keep, "k", false, "Keep temporary files even on compilation error")
 	args.StringVar(&code, "c", "", "Pass code on the command line instead of script file")
 	if err := args.Parse(os.Args[1:]); err != nil {
 		fmt.Println("Pass script file (if not using -C) and script args after the above flags")
@@ -74,7 +76,9 @@ func main() {
 		dbg.Println("Compiling code")
 		err = Compile(workdir)
 		if err != nil {
-			os.RemoveAll(workdir) // Cleanup as something failed
+			if !keep {
+				os.RemoveAll(workdir) // Cleanup as something failed
+			}
 			log.Fatalln("Failed to compile script in", workdir, err)
 		}
 	}
