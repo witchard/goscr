@@ -14,11 +14,16 @@ func Hash(code string) string {
 }
 
 func Workdir() (string, error) {
+	if dir, ok := os.LookupEnv("GOSCR_PATH"); ok {
+		return dir, os.MkdirAll(dir, 0o700)
+	}
+
 	dir, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(dir, ".goscr"), nil
+	dir = filepath.Join(dir, ".goscr")
+	return dir, os.MkdirAll(dir, 0o700)
 }
 
 func DirExists(workdir string) (bool, error) {
