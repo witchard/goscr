@@ -46,7 +46,7 @@ const footer string = `
 
 func Create(code string, imports []string, workdir string) error {
 	// Create dir
-	err := os.MkdirAll(workdir, os.ModePerm)
+	err := os.MkdirAll(workdir, 0o700)
 	if err != nil {
 		return err
 	}
