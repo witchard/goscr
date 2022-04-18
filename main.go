@@ -6,8 +6,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
-	"syscall"
 )
 
 var dbg *log.Logger
@@ -52,25 +52,53 @@ func main() {
 		runArgs = args.Args()
 	}
 
-	// Check if already compiled
-	hash := Hash(code)
-	dbg.Println("Code hash is", hash)
-	basedir, err := Workdir()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	workdir := filepath.Join(basedir, hash)
-	exists, err := DirExists(workdir)
+	hash, err := HashAndCreateIfNeeded(code, keep)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	err = RunProgram(hash, runArgs)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func HashAndCreateIfNeeded(code string, keep bool) (string, error) {
+	// Check if already compiled
+	hash := Hash(code)
+	dbg.Println("Code hash is", hash)
+
+	// Grab read lock for check
+	rd, err := LockRead(hash)
+	if err != nil {
+		return "", err
+	}
+	defer rd.Unlock()
+
+	basedir, err := Workdir()
+	if err != nil {
+		return "", err
+	}
+	workdir := filepath.Join(basedir, hash)
+	exists, err := DirExists(workdir)
+	if err != nil {
+		return "", err
+	}
+
 	if !exists {
+		// Upgrade to write lock
+		rd.Unlock()
+		wr, err := LockWrite(hash)
+		if err != nil {
+			return "", err
+		}
+		defer wr.Unlock()
+
 		dbg.Println("Creating code in", workdir)
 		err = Create(code, []string{}, workdir)
 		if err != nil {
 			os.RemoveAll(workdir) // Cleanup as something failed
-			log.Fatalln("Failed to create script compilation directory", err)
+			return "", fmt.Errorf("failed to create script compilation directory: %s", err)
 		}
 
 		dbg.Println("Compiling code")
@@ -79,14 +107,34 @@ func main() {
 			if !keep {
 				os.RemoveAll(workdir) // Cleanup as something failed
 			}
-			log.Fatalln("Failed to compile script in", workdir, err)
+			return "", fmt.Errorf("failed to compile script in %s: %s", workdir, err)
 		}
 	}
+	return hash, nil
+}
+
+func RunProgram(hash string, args []string) error {
+	lck, err := LockRead(hash)
+	if err != nil {
+		return err
+	}
+	defer lck.Unlock()
+
+	basedir, err := Workdir()
+	if err != nil {
+		return err
+	}
+	workdir := filepath.Join(basedir, hash)
 
 	binary := filepath.Join(workdir, "goscr")
-	dbg.Println("Executing", binary, "with args", runArgs)
-	err = syscall.Exec(binary, runArgs, os.Environ())
+	dbg.Println("Executing", binary, "with args", args)
+	cmd := exec.Command(binary, args...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err = cmd.Run()
 	if err != nil {
-		log.Fatalln("Failed to execute compiled script in", workdir, err)
+		return fmt.Errorf("failed to execute compiled script in %s: %s", workdir, err)
 	}
+	return nil
 }

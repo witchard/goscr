@@ -95,21 +95,25 @@ func LockRead(hash string) (Lock, error) {
 		return nil, err
 	}
 
-	// Note reads only work for existing hashes (i.e. programs that were created)
-	res, err := db.Exec(`UPDATE programs SET readers = readers + 1, accessed = ? 
+	_, err = db.Exec("INSERT INTO programs VALUES (?, ?, ?, ?)",
+		hash, time.Now().UTC(), 1, 0)
+	if err != nil {
+		// Already exists try and lock
+		res, err := db.Exec(`UPDATE programs SET readers = readers + 1, accessed = ? 
 						WHERE hash = ? AND writers = ? AND readers >= 0`,
-		time.Now().UTC(), hash, 0)
-	if err != nil {
-		db.Close()
-		return nil, err
-	}
-	rows, err := res.RowsAffected()
-	if err != nil {
-		db.Close()
-		return nil, err
-	}
-	if rows != 1 {
-		return nil, fmt.Errorf("attempt to lock currently locked program")
+			time.Now().UTC(), hash, 0)
+		if err != nil {
+			db.Close()
+			return nil, err
+		}
+		rows, err := res.RowsAffected()
+		if err != nil {
+			db.Close()
+			return nil, err
+		}
+		if rows != 1 {
+			return nil, fmt.Errorf("attempt to lock currently locked program")
+		}
 	}
 	return &ReadLock{hash, db}, nil
 }

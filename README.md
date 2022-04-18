@@ -35,7 +35,7 @@ This project has only just started... we still need to:
 
 - [X] Support compiling the same program twice - currently bombs out
 - [X] Used cached compiled code when the same script is run
-- [ ] Lock compilation directory so that parallel runs don't interfere with each other
+- [X] Lock compilation directory so that parallel runs don't interfere with each other
 - [X] Support command line options for your scripts
 - [X] Support `-c` for passing code on the command line
 - [ ] Allow user to hint at what imports are needed
@@ -44,3 +44,4 @@ This project has only just started... we still need to:
 - [ ] Test on mac and windows
 - [X] Support mode where code is run against each line of stdin
 - [ ] Improve module documentation (and of lines)
+- [ ] Add more unit tests :-)
