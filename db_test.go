@@ -63,17 +63,15 @@ func TestReadLock(t *testing.T) {
 	tmp := t.TempDir()
 	os.Setenv("GOSCR_PATH", tmp)
 
-	// Write lock to create entry
-	lockA, err := LockWrite("abc")
+	// Can obtain multiple read locks
+	lockA, err := LockRead("abc")
 	if err != nil {
 		t.Error("Couldn't get lock A", err)
 	}
 	if lockA == nil {
 		t.Error("Lock A is nil")
 	}
-	lockA.Unlock()
-
-	// Can obtain multiple read locks
+	defer lockA.Unlock()
 	lockB, err := LockRead("abc")
 	if err != nil {
 		t.Error("Can not obtain read lock B")
@@ -105,6 +103,7 @@ func TestReadLock(t *testing.T) {
 	}
 
 	// Can obtain write lock when read locks are released
+	lockA.Unlock()
 	lockB.Unlock()
 	lockC.Unlock()
 	lockE, err := LockWrite("abc")
