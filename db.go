@@ -97,7 +97,7 @@ func LockRead(hash string) (Lock, error) {
 
 	// Note reads only work for existing hashes (i.e. programs that were created)
 	res, err := db.Exec(`UPDATE programs SET readers = readers + 1, accessed = ? 
-						WHERE hash = ? AND writers = ?`,
+						WHERE hash = ? AND writers = ? AND readers >= 0`,
 		time.Now().UTC(), hash, 0)
 	if err != nil {
 		db.Close()
