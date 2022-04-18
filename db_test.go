@@ -59,5 +59,60 @@ func TestWriteLock(t *testing.T) {
 }
 
 func TestReadLock(t *testing.T) {
-	t.Error("TODO: Test multiple read locks can be obtained, and can't get write lock when read lock in place")
+	// Use temp dir for goscr files
+	tmp := t.TempDir()
+	os.Setenv("GOSCR_PATH", tmp)
+
+	// Write lock to create entry
+	lockA, err := LockWrite("abc")
+	if err != nil {
+		t.Error("Couldn't get lock A", err)
+	}
+	if lockA == nil {
+		t.Error("Lock A is nil")
+	}
+	lockA.Unlock()
+
+	// Can obtain multiple read locks
+	lockB, err := LockRead("abc")
+	if err != nil {
+		t.Error("Can not obtain read lock B")
+	}
+	if lockB == nil {
+		t.Error("Lock B is nil")
+	}
+	defer lockB.Unlock()
+	lockC, err := LockRead("abc")
+	if err != nil {
+		t.Error("Can not obtain read lock C")
+	}
+	if lockC == nil {
+		t.Error("Lock C is nil")
+	}
+	defer lockC.Unlock()
+
+	// Fail to write lock when holding read locks
+	lockD, err := LockWrite("abc")
+	if lockD != nil {
+		lockD.Unlock()
+		t.Error("Got lock D and should not have done")
+	}
+	if err == nil {
+		t.Error("Should have received error obtaining lock D")
+	}
+	if err.Error() != "attempt to lock currently locked program" {
+		t.Error("Unexpected error obtaining lock D", err)
+	}
+
+	// Can obtain write lock when read locks are released
+	lockB.Unlock()
+	lockC.Unlock()
+	lockE, err := LockWrite("abc")
+	if err != nil {
+		t.Error("Couldn't get lock E", err)
+	}
+	if lockE == nil {
+		t.Error("Lock E is nil")
+	}
+	defer lockE.Unlock()
 }
