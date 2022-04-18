@@ -1,6 +1,8 @@
 module github.com/witchard/goscr
 
-go 1.18
+go 1.17
+
+require modernc.org/sqlite v1.16.0
 
 require (
 	github.com/google/uuid v1.3.0 // indirect
@@ -18,7 +20,6 @@ require (
 	modernc.org/mathutil v1.4.1 // indirect
 	modernc.org/memory v1.0.7 // indirect
 	modernc.org/opt v0.1.1 // indirect
-	modernc.org/sqlite v1.16.0 // indirect
 	modernc.org/strutil v1.1.1 // indirect
 	modernc.org/token v1.0.0 // indirect
 )

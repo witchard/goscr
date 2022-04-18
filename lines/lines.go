@@ -11,7 +11,7 @@ import (
 
 type converter func(string) ([]reflect.Value, error)
 
-func Each(in io.Reader, cb any) error {
+func Each(in io.Reader, cb interface{}) error {
 	// Check callback looks correct
 	funcType := reflect.TypeOf(cb)
 	if funcType.Kind() != reflect.Func || funcType.NumIn() != 1 || funcType.NumOut() != 0 {
@@ -72,6 +72,6 @@ func Each(in io.Reader, cb any) error {
 	return nil
 }
 
-func EachStdin(cb any) error {
+func EachStdin(cb interface{}) error {
 	return Each(os.Stdin, cb)
 }
