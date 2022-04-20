@@ -18,10 +18,15 @@ func main() {
 	var keep bool
 	var force bool
 	var code string
+	var imports []string
 	args.BoolVar(&debug, "d", false, "Enable debug logging")
 	args.BoolVar(&keep, "k", false, "Keep temporary files even on compilation error")
 	args.BoolVar(&force, "f", false, "Force rebuild even if code is already compiled")
 	args.StringVar(&code, "c", "", "Pass code on the command line instead of script file")
+	args.Func("i", "Import hint (can specify multiple times)", func(i string) error {
+		imports = append(imports, i)
+		return nil
+	})
 	if err := args.Parse(os.Args[1:]); err != nil {
 		fmt.Println("Pass script file (if not using -C) and script args after the above flags")
 		os.Exit(1)
@@ -54,7 +59,7 @@ func main() {
 		runArgs = args.Args()
 	}
 
-	hash, err := HashAndCreateIfNeeded(code, keep, force)
+	hash, err := HashAndCreateIfNeeded(code, keep, force, imports)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -65,7 +70,7 @@ func main() {
 	}
 }
 
-func HashAndCreateIfNeeded(code string, keep, force bool) (string, error) {
+func HashAndCreateIfNeeded(code string, keep, force bool, imports []string) (string, error) {
 	// Check if already compiled
 	hash := Hash(code)
 	dbg.Println("Code hash is", hash)
@@ -101,8 +106,8 @@ func HashAndCreateIfNeeded(code string, keep, force bool) (string, error) {
 			os.RemoveAll(workdir)
 		}
 
-		dbg.Println("Creating code in", workdir)
-		err = Create(code, []string{}, workdir)
+		dbg.Println("Creating code in", workdir, "with imports", imports)
+		err = Create(code, imports, workdir)
 		if err != nil {
 			os.RemoveAll(workdir) // Cleanup as something failed
 			return "", fmt.Errorf("failed to create script compilation directory: %s", err)

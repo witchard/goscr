@@ -38,7 +38,7 @@ This project has only just started... we still need to:
 - [X] Lock compilation directory so that parallel runs don't interfere with each other
 - [X] Support command line options for your scripts
 - [X] Support `-c` for passing code on the command line
-- [ ] Allow user to hint at what imports are needed
+- [X] Allow user to hint at what imports are needed
 - [ ] Provide better mechanism for presenting compilation errors back to the user (map line numbers)
 - [ ] Clean up old compilation directories
 - [ ] Test on mac and windows
