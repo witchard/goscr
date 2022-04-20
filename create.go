@@ -16,15 +16,15 @@ import (
 
 const body string = `)
 
-func P(a ...any) (int, error) {
+func P(a ...interface{}) (int, error) {
 	return fmt.Println(a...)
 }
 
-func E(a ...any) (int, error) {
+func E(a ...interface{}) (int, error) {
 	return fmt.Fprintln(os.Stderr, a...)
 }
 
-func L(cb any) error {
+func L(cb interface{}) error {
 	return lines.EachStdin(cb)
 }
 
