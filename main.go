@@ -16,9 +16,11 @@ func main() {
 	args := flag.NewFlagSet("goscr", flag.ContinueOnError)
 	var debug bool
 	var keep bool
+	var force bool
 	var code string
 	args.BoolVar(&debug, "d", false, "Enable debug logging")
 	args.BoolVar(&keep, "k", false, "Keep temporary files even on compilation error")
+	args.BoolVar(&force, "f", false, "Force rebuild even if code is already compiled")
 	args.StringVar(&code, "c", "", "Pass code on the command line instead of script file")
 	if err := args.Parse(os.Args[1:]); err != nil {
 		fmt.Println("Pass script file (if not using -C) and script args after the above flags")
@@ -38,7 +40,7 @@ func main() {
 	} else {
 		if len(args.Args()) == 0 {
 			args.Usage()
-			fmt.Println("Pass script file (if not using -C) and script args after the above flags")
+			fmt.Println("Pass script file (if not using -c) and script args after the above flags")
 			os.Exit(1)
 		}
 
@@ -52,7 +54,7 @@ func main() {
 		runArgs = args.Args()
 	}
 
-	hash, err := HashAndCreateIfNeeded(code, keep)
+	hash, err := HashAndCreateIfNeeded(code, keep, force)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -63,7 +65,7 @@ func main() {
 	}
 }
 
-func HashAndCreateIfNeeded(code string, keep bool) (string, error) {
+func HashAndCreateIfNeeded(code string, keep, force bool) (string, error) {
 	// Check if already compiled
 	hash := Hash(code)
 	dbg.Println("Code hash is", hash)
@@ -85,7 +87,7 @@ func HashAndCreateIfNeeded(code string, keep bool) (string, error) {
 		return "", err
 	}
 
-	if !exists {
+	if force || !exists {
 		// Upgrade to write lock
 		rd.Unlock()
 		wr, err := LockWrite(hash)
@@ -93,6 +95,11 @@ func HashAndCreateIfNeeded(code string, keep bool) (string, error) {
 			return "", err
 		}
 		defer wr.Unlock()
+
+		if force && exists {
+			dbg.Println("Removing existing dir", workdir)
+			os.RemoveAll(workdir)
+		}
 
 		dbg.Println("Creating code in", workdir)
 		err = Create(code, []string{}, workdir)
