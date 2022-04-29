@@ -1,3 +1,3 @@
-fmt.Println("Hello goscr, searching stdin for 'Error'")
-fmt.Println(os.Args)
+P("Hello goscr, searching stdin for 'Error'")
+P(os.Args)
 script.Stdin().Match("Error").Stdout()

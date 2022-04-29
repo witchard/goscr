@@ -6,10 +6,7 @@ Inspired by https://github.com/bitfield/script, this project aims to make it eve
 
 ## Installation
 
-You need `goimports` and the `go` compiler installed and on your `$PATH`:
-
-- Get go from https://go.dev
-- Install `goimports` with `go install golang.org/x/tools/cmd/goimports@latest`
+You the `go` compiler installed, get it from https://go.dev.
 
 Then install this with:
 

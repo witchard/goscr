@@ -3,8 +3,10 @@ package main
 import (
 	"crypto/sha1"
 	"encoding/base32"
+	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 )
 
@@ -39,4 +41,21 @@ func DirExists(workdir string) (bool, error) {
 		return false, fmt.Errorf("%s is not a directory", workdir)
 	}
 	return true, nil
+}
+
+func Run(dir string, cmd string, args ...string) error {
+	command := exec.Command(cmd, args...)
+	command.Dir = dir
+	out, err := command.Output()
+	if err != nil {
+		var execErr *exec.ExitError
+		if errors.As(err, &execErr) {
+			fmt.Println("Command", cmd, args, "exited with status", execErr.ProcessState.ExitCode())
+			fmt.Println("---------- stdout ----------")
+			fmt.Println(string(out))
+			fmt.Println("---------- stdout ----------")
+			fmt.Println(string(execErr.Stderr))
+		}
+	}
+	return err
 }

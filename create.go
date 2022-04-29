@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
+
+	format "golang.org/x/tools/imports"
 )
 
 const header string = `package main
@@ -36,10 +39,11 @@ func main() {
 }
 
 func __run_goscr__() (err error) {
-	
+	// ---- START USER CODE ----
 `
 
 const footer string = `
+	// ---- END USER CODE ----
 	return
 }
 `
@@ -51,40 +55,56 @@ func Create(code string, imports []string, workdir string) error {
 		return err
 	}
 
-	// Write file
-	file, err := os.Create(filepath.Join(workdir, "main.go"))
-	if err != nil {
+	// Setup go.mod
+	if err := Run(workdir, "go", "mod", "init", "goscr"); err != nil {
 		return err
 	}
-	defer file.Close()
 
-	_, err = fmt.Fprint(file, header)
+	// Build file contents
+	buf := &bytes.Buffer{}
+
+	_, err = fmt.Fprint(buf, header)
 	if err != nil {
 		return err
 	}
 
 	for _, dep := range imports {
-		_, err = fmt.Fprintf(file, "\t\"%s\"\n", dep)
+		_, err = fmt.Fprintf(buf, "\t\"%s\"\n", dep)
 		if err != nil {
 			return err
 		}
 
 	}
 
-	_, err = fmt.Fprint(file, body)
+	_, err = fmt.Fprint(buf, body)
 	if err != nil {
 		return err
 	}
 
-	_, err = fmt.Fprint(file, string(code))
+	_, err = fmt.Fprint(buf, code)
 	if err != nil {
 		return err
 	}
 
-	_, err = fmt.Fprint(file, footer)
+	_, err = fmt.Fprint(buf, footer)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	// Sort imports / format file
+	mainFile := filepath.Join(workdir, "main.go")
+	formatted, err := format.Process(mainFile, buf.Bytes(), nil)
+	if err != nil {
+		return err
+	}
+
+	// Write file
+	file, err := os.Create(mainFile)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(formatted)
+	return err
 }
