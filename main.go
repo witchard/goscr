@@ -141,6 +141,7 @@ func RunProgram(hash string, args []string) error {
 	binary := filepath.Join(workdir, "goscr")
 	dbg.Println("Executing", binary, "with args", args)
 	cmd := exec.Command(binary, args...)
+	cmd.Args = cmd.Args[1:] // Our args already has in it what we wish to pass as the binary name
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
