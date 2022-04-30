@@ -70,6 +70,8 @@ func main() {
 	}
 }
 
+// HashAndCreateIfNeeded will check if we have already compiled the provided code and compile it if not.
+// A hash of the code is returned for use later.
 func HashAndCreateIfNeeded(code string, keep, force bool, imports []string) (string, error) {
 	// Check if already compiled
 	hash := Hash(code)
@@ -125,6 +127,7 @@ func HashAndCreateIfNeeded(code string, keep, force bool, imports []string) (str
 	return hash, nil
 }
 
+// RunProgram executes the compiled program for a script with the provided hash
 func RunProgram(hash string, args []string) error {
 	lck, err := LockRead(hash)
 	if err != nil {

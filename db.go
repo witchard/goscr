@@ -9,6 +9,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+// Lock provides a mechanism for locking script hashes
 type Lock interface {
 	Unlock()
 }
@@ -50,6 +51,7 @@ func openDb() (*sql.DB, error) {
 	return db, nil
 }
 
+// LockWrite locks a compilation hash for writing into its directory
 func LockWrite(hash string) (Lock, error) {
 	db, err := openDb()
 	if err != nil {
@@ -80,6 +82,7 @@ func LockWrite(hash string) (Lock, error) {
 	return &WriteLock{hash, db}, nil
 }
 
+// Unlock releases the lock
 func (l *WriteLock) Unlock() {
 	if l != nil && l.db != nil {
 		l.db.Exec(`UPDATE programs SET writers = ?, accessed = ? 
@@ -90,6 +93,7 @@ func (l *WriteLock) Unlock() {
 	}
 }
 
+// LockRead locks a compilation hash for reading from its directory
 func LockRead(hash string) (Lock, error) {
 	db, err := openDb()
 	if err != nil {
@@ -120,6 +124,7 @@ func LockRead(hash string) (Lock, error) {
 	return &ReadLock{hash, db}, nil
 }
 
+// Unlock releases the lock
 func (l *ReadLock) Unlock() {
 	if l != nil && l.db != nil {
 		l.db.Exec(`UPDATE programs SET readers = readers - 1, accessed = ? 

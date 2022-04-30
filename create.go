@@ -48,6 +48,7 @@ const footer string = `
 }
 `
 
+// Create builds the source code from the script and writes it into workdir
 func Create(code string, imports []string, workdir string) error {
 	// Create dir
 	err := os.MkdirAll(workdir, 0o700)
