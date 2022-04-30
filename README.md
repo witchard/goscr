@@ -1,6 +1,6 @@
 # goscr
 
-Use go like its a scripting language
+Use go like its a scripting language.
 
 Inspired by https://github.com/bitfield/script, this project aims to make it even easier to write go "scripts". You can for example do things like `goscr -c 'script.Stdin().Match("Error").Stdout()'` to quickly run a go script. You can also pass a script in as a file as `goscr <somescript>`.
 
@@ -11,6 +11,8 @@ You the `go` compiler installed, get it from https://go.dev.
 Then install this with:
 
 - `go install github.com/witchard/goscr@latest`
+
+`goscr` should work on windows, linux and mac.
 
 ## Usage
 
@@ -38,7 +40,7 @@ This project has only just started... we still need to:
 - [X] Allow user to hint at what imports are needed
 - [ ] Provide better mechanism for presenting compilation errors back to the user (map line numbers)
 - [ ] Clean up old compilation directories
-- [ ] Test on mac and windows
+- [X] Test on mac and windows
 - [X] Support mode where code is run against each line of stdin
 - [ ] Improve module documentation (and of lines)
 - [ ] Add more unit tests :-)
