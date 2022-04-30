@@ -1,0 +1,17 @@
+on: [push, pull_request]
+name: Lint
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: [1.18.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ matrix.go-version }}
+    - uses: actions/checkout@v3
+    # gofmt doesn't exit 1 if it was going to make changes... so we count how many files it would have changed
+    - run: if [ $(gofmt -l . | wc -l) -gt 0 ]; then exit 1; fi
+    - run: go vet ./...

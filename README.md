@@ -1,5 +1,8 @@
 # goscr
 
+![tests](https://github.com/witchard/goscr/workflows/Test/badge.svg)
+![lint](https://github.com/witchard/goscr/workflows/Lint/badge.svg)
+
 Use go like its a scripting language.
 
 Inspired by https://github.com/bitfield/script, this project aims to make it even easier to write go "scripts". You can for example do things like `goscr -c 'script.Stdin().Match("Error").Stdout()'` to quickly run a go script. You can also pass a script in as a file as `goscr <somescript>`, or use `goscr` in a shebang.
