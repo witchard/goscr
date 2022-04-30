@@ -73,6 +73,7 @@ func LockWrite(hash string) (Lock, error) {
 			return nil, err
 		}
 		if rows != 1 {
+			db.Close()
 			return nil, fmt.Errorf("attempt to lock currently locked program")
 		}
 	}
@@ -112,6 +113,7 @@ func LockRead(hash string) (Lock, error) {
 			return nil, err
 		}
 		if rows != 1 {
+			db.Close()
 			return nil, fmt.Errorf("attempt to lock currently locked program")
 		}
 	}
