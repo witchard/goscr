@@ -11,11 +11,13 @@ import (
 	"strings"
 )
 
+// Hash provides a hash of the script code
 func Hash(code string) string {
 	sha := sha1.Sum([]byte(code))
 	return base32.StdEncoding.EncodeToString(sha[:])
 }
 
+// Workdir computes the goscr working folder
 func Workdir() (string, error) {
 	if dir, ok := os.LookupEnv("GOSCR_PATH"); ok {
 		return dir, os.MkdirAll(dir, 0o700)
@@ -29,6 +31,7 @@ func Workdir() (string, error) {
 	return dir, os.MkdirAll(dir, 0o700)
 }
 
+// DirExists validates that the provided directory exists
 func DirExists(workdir string) (bool, error) {
 	stat, err := os.Stat(workdir)
 	if err != nil {
@@ -44,6 +47,7 @@ func DirExists(workdir string) (bool, error) {
 	return true, nil
 }
 
+// Run executes a command for use when compiling programs created from scripts
 func Run(dir string, cmd string, args ...string) error {
 	command := exec.Command(cmd, args...)
 	command.Dir = dir
@@ -61,6 +65,7 @@ func Run(dir string, cmd string, args ...string) error {
 	return err
 }
 
+// StripShebang removes the shebang line if it is present at the beginning of the provided string
 func StripShebang(in string) string {
 	split := strings.SplitN(in, "\n", 2)
 	if strings.HasPrefix(split[0], "#!") {

@@ -11,6 +11,9 @@ import (
 
 type converter func(string) ([]reflect.Value, error)
 
+// Each executes callback function cb for each line of in.
+// The callback should recieve one argument and return nothing.
+// Each line of in is converted to the type of the argument.
 func Each(in io.Reader, cb interface{}) error {
 	// Check callback looks correct
 	funcType := reflect.TypeOf(cb)
@@ -72,6 +75,7 @@ func Each(in io.Reader, cb interface{}) error {
 	return nil
 }
 
+// EachStdin runs each for every line of stdin.
 func EachStdin(cb interface{}) error {
 	return Each(os.Stdin, cb)
 }
