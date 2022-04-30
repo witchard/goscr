@@ -1,3 +1,5 @@
+#!/usr/bin/env goscr
+
 P("Hello goscr, searching stdin for 'Error'")
 P(os.Args)
 script.Stdin().Match("Error").Stdout()

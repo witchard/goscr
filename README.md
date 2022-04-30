@@ -2,7 +2,7 @@
 
 Use go like its a scripting language.
 
-Inspired by https://github.com/bitfield/script, this project aims to make it even easier to write go "scripts". You can for example do things like `goscr -c 'script.Stdin().Match("Error").Stdout()'` to quickly run a go script. You can also pass a script in as a file as `goscr <somescript>`.
+Inspired by https://github.com/bitfield/script, this project aims to make it even easier to write go "scripts". You can for example do things like `goscr -c 'script.Stdin().Match("Error").Stdout()'` to quickly run a go script. You can also pass a script in as a file as `goscr <somescript>`, or use `goscr` in a shebang.
 
 ## Installation
 
@@ -28,6 +28,8 @@ A function `L` is available for processing each line of stdin, it calls a callba
 echo -e "1\n2\n3" | goscr -c "s := 0; err = L(func(i int){s += i}); P(s)"
 ```
 
+`goscr` also works with a shebang (`#!`), see [example.goscr](example.goscr).
+
 ## To do
 
 This project has only just started... we still need to:
@@ -38,9 +40,15 @@ This project has only just started... we still need to:
 - [X] Support command line options for your scripts
 - [X] Support `-c` for passing code on the command line
 - [X] Allow user to hint at what imports are needed
+- [X] Support working with `#!`
 - [ ] Provide better mechanism for presenting compilation errors back to the user (map line numbers)
 - [ ] Clean up old compilation directories
 - [X] Test on mac and windows
 - [X] Support mode where code is run against each line of stdin
 - [ ] Improve module documentation (and of lines)
 - [ ] Add more unit tests :-)
+
+## Alternatives
+
+* For the ability to run go programs with a shebang: https://github.com/erning/gorun
+* Extended go syntax with scripting feel: https://github.com/goplus/gop

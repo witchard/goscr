@@ -54,7 +54,7 @@ func main() {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		code = string(codeRaw)
+		code = StripShebang(string(codeRaw))
 
 		runArgs = args.Args()
 	}

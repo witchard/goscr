@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 func Hash(code string) string {
@@ -58,4 +59,12 @@ func Run(dir string, cmd string, args ...string) error {
 		}
 	}
 	return err
+}
+
+func StripShebang(in string) string {
+	split := strings.SplitN(in, "\n", 2)
+	if strings.HasPrefix(split[0], "#!") {
+		return split[1]
+	}
+	return in
 }
