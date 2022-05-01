@@ -5,6 +5,7 @@ import (
 	"encoding/base32"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -55,11 +56,15 @@ func Run(dir string, cmd string, args ...string) error {
 	if err != nil {
 		var execErr *exec.ExitError
 		if errors.As(err, &execErr) {
-			fmt.Println("Command", cmd, args, "exited with status", execErr.ProcessState.ExitCode())
-			fmt.Println("---------- stdout ----------")
-			fmt.Println(string(out))
-			fmt.Println("---------- stdout ----------")
-			fmt.Println(string(execErr.Stderr))
+			dbg.Println("Command", cmd, args, "exited with status", execErr.ProcessState.ExitCode())
+			dbg.Println("---------- stdout ----------")
+			dbg.Println(string(out))
+			dbg.Println("---------- stderr ----------")
+			dbg.Println(string(execErr.Stderr))
+			code, _ := ioutil.ReadFile(filepath.Join(dir, "main.go"))
+			for _, line := range strings.Split(string(execErr.Stderr), "\n") {
+				PrintErrorLine(string(code), line)
+			}
 		}
 	}
 	return err

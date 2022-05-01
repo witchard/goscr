@@ -28,7 +28,7 @@ func main() {
 		return nil
 	})
 	if err := args.Parse(os.Args[1:]); err != nil {
-		fmt.Println("Pass script file (if not using -C) and script args after the above flags")
+		fmt.Println("Pass script file (if not using -c) and script args after the above flags")
 		os.Exit(1)
 	}
 
@@ -112,7 +112,7 @@ func HashAndCreateIfNeeded(code string, keep, force bool, imports []string) (str
 		err = Create(code, imports, workdir)
 		if err != nil {
 			os.RemoveAll(workdir) // Cleanup as something failed
-			return "", fmt.Errorf("failed to create code in %s: %s", workdir, err)
+			return "", fmt.Errorf("failed to create code compilation direcory: %s", err)
 		}
 
 		dbg.Println("Compiling code")
@@ -121,7 +121,7 @@ func HashAndCreateIfNeeded(code string, keep, force bool, imports []string) (str
 			if !keep {
 				os.RemoveAll(workdir) // Cleanup as something failed
 			}
-			return "", fmt.Errorf("failed to compile code in %s: %s", workdir, err)
+			return "", fmt.Errorf("failed to compile code: %s", err)
 		}
 	}
 	return hash, nil
