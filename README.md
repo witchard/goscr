@@ -9,11 +9,9 @@ Inspired by https://github.com/bitfield/script, this project aims to make it eve
 
 ## Installation
 
-You the `go` compiler installed, get it from https://go.dev.
-
-Then install this with:
-
-- `go install github.com/witchard/goscr@latest`
+* You need the `go` compiler installed, get it from https://go.dev.
+* Install / update with `go install github.com/witchard/goscr@latest`.
+* Ensure the `bin` directory under `go env GOPATH` is on your `PATH`.
 
 `goscr` should work on windows, linux and mac.
 
@@ -44,7 +42,7 @@ This project has only just started... we still need to:
 - [X] Support `-c` for passing code on the command line
 - [X] Allow user to hint at what imports are needed
 - [X] Support working with `#!`
-- [ ] Provide better mechanism for presenting compilation errors back to the user (map line numbers)
+- [X] Provide better mechanism for presenting compilation errors back to the user (map line numbers)
 - [ ] Clean up old compilation directories
 - [X] Test on mac and windows
 - [X] Support mode where code is run against each line of stdin
