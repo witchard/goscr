@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"testing"
+	"time"
 )
 
 func TestWriteLock(t *testing.T) {
@@ -56,6 +57,80 @@ func TestWriteLock(t *testing.T) {
 		t.Error("Lock C is nil")
 	}
 	defer lockC.Unlock()
+}
+
+func TestWriteUpdated(t *testing.T) {
+	// Use temp dir for goscr files
+	tmp := t.TempDir()
+	os.Setenv("GOSCR_PATH", tmp)
+
+	// Lock new hash
+	before := time.Now().UTC()
+	lock, err := LockWrite("abc")
+	if err != nil || lock == nil {
+		t.Error("Couldn't get lock", err)
+	}
+	defer lock.Unlock()
+	after := time.Now().UTC()
+
+	// List database to confirm correct entries
+	entries, err := ListEntries()
+	if err != nil {
+		t.Error("Failed to list entries", err)
+	}
+	if len(entries) != 1 {
+		t.Error("Incorrect number of entries", entries)
+	}
+	if entries[0].hash != "abc" {
+		t.Error("Wrong entry found", entries[0])
+	}
+
+	// Check accessed time is between before & after
+	accessed := lock.Accessed()
+	if before.After(accessed) || after.Before(accessed) {
+		t.Errorf("Invalid updated times %s %s %s", before, accessed, after)
+	}
+	if accessed != entries[0].accessed {
+		t.Error("Accessed time missmatch", accessed, entries[0].accessed)
+	}
+
+	// Re-obtain lock and verify accessed time unchanged
+	before = time.Now().UTC()
+	lock.Unlock() // Releasing lock updates access time
+	after = time.Now().UTC()
+	lock, err = LockWrite("abc")
+	if err != nil || lock == nil {
+		t.Error("Couldn't get lock", err)
+	}
+	defer lock.Unlock()
+	accessed = lock.Accessed()
+	if before.After(accessed) || after.Before(accessed) {
+		t.Errorf("Invalid updated times %s %s %s", before, accessed, after)
+	}
+}
+
+func TestWriteDelete(t *testing.T) {
+	// Use temp dir for goscr files
+	tmp := t.TempDir()
+	os.Setenv("GOSCR_PATH", tmp)
+
+	// Lock new hash
+	lock, err := LockWrite("abc")
+	if err != nil || lock == nil {
+		t.Error("Couldn't get lock", err)
+	}
+	defer lock.Unlock()
+
+	// Delete it and make sure its gone
+	lock.Delete()
+
+	entries, err := ListEntries()
+	if err != nil {
+		t.Error("Failed to list entries", err)
+	}
+	if len(entries) != 0 {
+		t.Error("Still entries in database", entries)
+	}
 }
 
 func TestReadLock(t *testing.T) {
