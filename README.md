@@ -31,6 +31,12 @@ echo -e "1\n2\n3" | goscr -c "s := 0; err = L(func(i int){s += i}); P(s)"
 
 `goscr` also works with a shebang (`#!`), see [example.goscr](example.goscr).
 
+## Environment variables
+
+The following variables affect how goscr functions:
+* `GOSCR_PATH` - Sets where compiled programs are storred
+* `GOSCR_CLEANUP` - Sets the number of days old a program must be before it is automatically cleaned up
+
 ## To do
 
 This project has only just started... we still need to:
@@ -48,6 +54,7 @@ This project has only just started... we still need to:
 - [X] Support mode where code is run against each line of stdin
 - [ ] Improve module documentation (and of lines)
 - [ ] Add more unit tests :-)
+- [ ] If filename is invalid, parse as code from command line instead
 
 ## Alternatives
 

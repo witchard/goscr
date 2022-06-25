@@ -17,11 +17,13 @@ func main() {
 	var debug bool
 	var keep bool
 	var force bool
+	var nocleanup bool
 	var code string
 	var imports []string
 	args.BoolVar(&debug, "d", false, "Enable debug logging")
 	args.BoolVar(&keep, "k", false, "Keep temporary files even on compilation error")
 	args.BoolVar(&force, "f", false, "Force rebuild even if code is already compiled")
+	args.BoolVar(&nocleanup, "n", false, "Do not cleanup old programs at startup")
 	args.StringVar(&code, "c", "", "Pass code on the command line instead of script file")
 	args.Func("i", "Import hint (can specify multiple times)", func(i string) error {
 		imports = append(imports, i)
@@ -36,6 +38,12 @@ func main() {
 		dbg = log.New(os.Stderr, "debug ", log.LstdFlags)
 	} else {
 		dbg = log.New(io.Discard, "debug ", log.LstdFlags)
+	}
+
+	if !nocleanup {
+		if err := Cleanup(); err != nil {
+			log.Fatalln("Failed to run initial cleanup:", err)
+		}
 	}
 
 	var runArgs []string
