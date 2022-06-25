@@ -190,3 +190,42 @@ func TestReadLock(t *testing.T) {
 	}
 	defer lockE.Unlock()
 }
+
+func TestList(t *testing.T) {
+	before := time.Now().UTC()
+
+	lA, err := LockWrite("abc")
+	if err != nil || lA == nil {
+		t.Error("Failed to create lock A", err)
+	}
+	defer lA.Unlock()
+
+	lB, err := LockRead("def")
+	if err != nil || lA == nil {
+		t.Error("Failed to create lock B", err)
+	}
+	defer lB.Unlock()
+
+	after := time.Now().UTC()
+
+	entries, err := ListEntries()
+	if err != nil {
+		t.Error("Failed to list entries", err)
+	}
+	found := map[string]int{}
+	for _, e := range entries {
+		found[e.hash]++
+		if before.After(e.accessed) || after.Before(e.accessed) {
+			t.Errorf("Invalid updated times for %s: %s %s %s", e.hash, before, e.accessed, after)
+		}
+	}
+	if len(found) != 2 {
+		t.Error("Found wrong number of items", found)
+	}
+	if found["abc"] != 1 {
+		t.Error("abc incorrect in", found)
+	}
+	if found["def"] != 1 {
+		t.Error("def incorrect in", found)
+	}
+}

@@ -59,6 +59,7 @@ func ListEntries() ([]Entry, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer db.Close()
 
 	rows, err := db.Query("SELECT hash, accessed FROM programs")
 	if err != nil {
