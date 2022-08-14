@@ -53,3 +53,4 @@ This project has only just started... we still need to:
 
 * For the ability to run go programs with a shebang: https://github.com/erning/gorun
 * Extended go syntax with scripting feel: https://github.com/goplus/gop
+* Golang repl and script support: https://github.com/traefik/yaegi
